@@ -1,0 +1,48 @@
+.gcomp {
+    display:none;
+}
+
+.gadditional {
+    display: none;
+}
+
+.gres {
+    display: none;
+}
+
+.gdur {
+    display: none;
+}
+
+.gstartdate {
+    display: none;
+}
+
+.genddate {
+    display: none;
+}
+
+ul {
+    list-style-type: none;
+}
+
+.clickable:hover {
+    cursor: pointer;
+}
+
+.gTIc {
+    display: none;
+}
+
+.gtaskname div, .gtaskname {
+    width: 240px;
+    max-width: 240px;
+}
+
+.parent-text {
+    padding: 10px 10px 10px 5px;
+}
+
+.list-child {
+    padding-left: 20px;
+}
