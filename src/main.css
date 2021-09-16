@@ -12,8 +12,8 @@ ul {
 }
 
 .gtaskname div, .gtaskname {
-    width: 240px;
-    max-width: 240px;
+    width: 400px;
+    max-width: 400px;
 }
 
 .parent-text {
@@ -22,4 +22,27 @@ ul {
 
 .list-child {
     padding-left: 20px;
+}
+
+.parent_container {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.modal__overlay {
+    z-index: 2;
+}
+
+.modal__close {
+    outline: none;
+}
+
+.modal__overlay .modal__container {
+    height: 500px;
+    overflow-y: initial;
+}
+
+.modal__content {
+    max-height: calc(100% - 70px);
+    overflow-y: auto;
 }

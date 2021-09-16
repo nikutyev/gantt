@@ -54,7 +54,7 @@ const ru = {
     'day': 'День',
     'week': 'Неделя',
     'month': 'Месяц',
-    'quarter': 'Кварт',
+    'quarter': 'Квартал',
     'hours': 'Часов',
     'days': 'Дней',
     'weeks': 'Недель',

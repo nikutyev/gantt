@@ -9,7 +9,7 @@ import "./main.css";
 import "./micromodal.css";
 
 
-const g = new JSGantt.GanttChart(document.getElementById('GanttChartDIV'), 'day');
+const g = new JSGantt.GanttChart(document.getElementById('GanttChartDIV'), 'month');
 const parentElementsText = document.querySelector("#parent_elements");
 
 g.addLang('ru1', ru);
