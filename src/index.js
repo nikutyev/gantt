@@ -27,6 +27,16 @@ g.setOptions({
     vFormatArr: ['Day', 'Week', 'Month', 'Quarter'], // Even with setUseSingleCell using Hour format on such a large chart can cause issues in some browsers,
 });
 g.setDateTaskTableDisplayFormat("dd.mm.yyyy");
+g.setShowRes(0);
+g.setShowTaskInfoRes(0);
+g.setShowTaskInfoNotes(0);
+g.setShowComp(0);
+g.setShowTaskInfoComp(0);
+g.setShowPlanStartDate(0);
+g.setShowPlanEndDate(0);
+g.setShowStartDate(0);
+g.setShowEndDate(0);
+g.setShowDur(0);
 
 const res = JSON.parse(a);
 
