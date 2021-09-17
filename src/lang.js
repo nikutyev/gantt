@@ -47,7 +47,7 @@ const ru = {
     'planenddate': 'Plan Кон. дата',
     'cost': 'Cost',
     'moreinfo': 'Детали',
-    'nodata': 'No tasks found',
+    'nodata': 'Нет данных',
     'notes': 'Дополнительно',
     'format': 'Формат',
     'hour': 'Час',

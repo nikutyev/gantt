@@ -9,38 +9,20 @@ import "./main.css";
 import "./micromodal.css";
 
 
-const g = new JSGantt.GanttChart(document.getElementById('GanttChartDIV'), 'month');
 const parentElementsText = document.querySelector("#parent_elements");
-
-g.addLang('ru1', ru);
-
-g.setOptions({
-    vCaptionType: 'Complete',  // Set to Show Caption : None,Caption,Resource,Duration,Complete,
-    vQuarterColWidth: 36,
-    vDateTaskDisplayFormat: 'dd.mm.yyyy', // Shown in tool tip box
-    vDayMajorDateDisplayFormat: 'mon yyyy - Week ww',// Set format to dates in the "Major" header of the "Day" view
-    vWeekMinorDateDisplayFormat: 'dd mon', // Set format to display dates in the "Minor" header of the "Week" view
-    vLang: 'ru1',
-    vShowTaskInfoLink: 0, // Show link in tool tip (0/1)
-    vShowEndWeekDate: 0,  // Show/Hide the date for the last day of the week in header for daily
-    vUseSingleCell: 10000, // Set the threshold cell per table row (Helps performance for large data.
-    vFormatArr: ['Day', 'Week', 'Month', 'Quarter'], // Even with setUseSingleCell using Hour format on such a large chart can cause issues in some browsers,
-});
-g.setDateTaskTableDisplayFormat("dd.mm.yyyy");
-g.setShowRes(0);
-g.setShowTaskInfoRes(0);
-g.setShowTaskInfoNotes(0);
-g.setShowComp(0);
-g.setShowTaskInfoComp(0);
-g.setShowPlanStartDate(0);
-g.setShowPlanEndDate(0);
-g.setShowStartDate(0);
-g.setShowEndDate(0);
-g.setShowDur(0);
+const acceptedSelect = document.querySelector("#accepted_select");
+const expandSelect = document.querySelector("#expand_select");
+const hideOldSelect = document.querySelector("#hide_old_select");
 
 const res = JSON.parse(a);
 
 const array = res.OpenDimResult.meta.els.els.e;
+
+const displaySettings = {
+    acceptedStatus: null,
+    hideOldTasks: false,
+    expandAll: false,
+};
 
 const pItems = [];
 for (let i = 0; i < array.length; i++) {
@@ -54,32 +36,61 @@ function getItemIndex(key) {
             return i;
 }
 
-function setParentElementsText(key) {
-    let item = array[getItemIndex(key)];
-    let text = item.n;
-    while (item.p && item.p.length > 0) {
-        item = array[getItemIndex(item.p)];
-        text = item.n + " > " + text;
-    }
-    parentElementsText.innerHTML = text;
-}
+let lastParentKey = null;
+function redraw(parentKey = lastParentKey, settings = displaySettings) {
+    lastParentKey = parentKey;
 
-function drawChildren(key) {
-    let index = getItemIndex(key) + 1;
-    g.ClearTasks();
+    const g = new JSGantt.GanttChart(document.getElementById('GanttChartDIV'), 'month');
 
+    g.addLang('ru1', ru);
+
+    g.setOptions({
+        vCaptionType: 'Complete',
+        vQuarterColWidth: 36,
+        vDateTaskDisplayFormat: 'dd.mm.yyyy',
+        vDayMajorDateDisplayFormat: 'mon yyyy - Week ww',
+        vWeekMinorDateDisplayFormat: 'dd mon',
+        vLang: 'ru1',
+        vShowTaskInfoLink: 0,
+        vShowEndWeekDate: 0,
+        vUseSingleCell: 10000,
+        vFormatArr: ['Day', 'Week', 'Month', 'Quarter'],
+        vScrollTo: "today",
+    });
+    g.setDateTaskTableDisplayFormat("dd.mm.yyyy");
+    g.setShowRes(0);
+    g.setShowTaskInfoRes(0);
+    g.setShowTaskInfoNotes(0);
+    g.setShowComp(0);
+    g.setShowTaskInfoComp(0);
+    g.setShowPlanStartDate(0);
+    g.setShowPlanEndDate(0);
+    g.setShowStartDate(0);
+    g.setShowEndDate(0);
+    g.setShowDur(0);
+
+    let index = getItemIndex(parentKey) + 1;
+    let items = [];
     while (true) {
         const item = array[index];
-        const next = array[index + 1];
         const level = parseInt(item.a.it[7]);
         if (!level || level === 0)
             break;
+        items.push(item);
+        index ++;
+    }
 
-        let notes = "";
-        const accepted = parseInt(item.a.it[8]);
-        if (accepted === 1 || accepted === 0) {
-            notes += "Согласовано: " + (accepted === 1 ? "Да" : "Нет");
-        }
+    const today = new Date();
+    items = items.filter(item =>
+        (!settings.acceptedStatus || item.a.it[8] == settings.acceptedStatus)
+        && (!settings.hideOldTasks || new Date(item.a.it[4]) > today)
+    );
+
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        const next = items[i + 1];
+        const level = parseInt(item.a.it[7]);
+        // const accepted = item.a.it[8];
 
         g.AddTaskItemObject({
             pID: parseInt(item.k),
@@ -93,21 +104,30 @@ function drawChildren(key) {
             pComp: 0,
             pGroup: next && next.p === item.k ? 1 : 0,
             pParent: level > 1 && item.p !== undefined && item.p.length > 0 ? parseInt(item.p) : 0,
-            pOpen: 0,
+            pOpen: settings.expandAll ? 1 : 0,
             pDepend: "",
             pCaption: "",
-            pNotes: notes,
+            pNotes: "",
         });
-        index++;
     }
 
     g.Draw();
 }
 
+function setParentElementsText(key) {
+    let item = array[getItemIndex(key)];
+    let text = item.n;
+    while (item.p && item.p.length > 0) {
+        item = array[getItemIndex(item.p)];
+        text = item.n + " > " + text;
+    }
+    parentElementsText.innerHTML = text;
+}
+
 function setFirstItemSelected() {
     for (let i = 0; i < array.length; i++) {
         if (parseInt(array[i].a.it[7]) === 0 && parseInt(array[i + 1].a.it[7]) === 1) {
-            drawChildren(parseInt(array[i].k));
+            redraw(parseInt(array[i].k));
             setParentElementsText(parseInt(array[i].k));
             break;
         }
@@ -125,7 +145,7 @@ function buildModalList() {
             li.addEventListener("click", () => {
                 MicroModal.close('modal-1');
                 setParentElementsText(parseInt(item.k));
-                drawChildren(parseInt(item.k));
+                redraw(parseInt(item.k));
             });
             li.classList.add("clickable");
             li.classList.add("list-child");
@@ -136,6 +156,18 @@ function buildModalList() {
 
 parentElementsText.addEventListener("click", () => {
     MicroModal.show('modal-1');
+});
+acceptedSelect.addEventListener("change", (e) => {
+    displaySettings.acceptedStatus = e.target.value;
+    redraw();
+});
+expandSelect.addEventListener("change", (e) => {
+    displaySettings.expandAll = e.target.value;
+    redraw();
+});
+hideOldSelect.addEventListener("change", (e) => {
+    displaySettings.hideOldTasks = e.target.value;
+    redraw();
 });
 
 buildModalList();
