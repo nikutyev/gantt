@@ -97,7 +97,7 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
             pName: item.n,
             pStart: item.a.it[3],
             pEnd: item.a.it[4],
-            pClass: "gtaskblue",
+            pClass: item.o - 1 < 4 && item.o - 1 > 0 ? "gtaskblue" + (item.o - 1) : "gtaskblue",
             pLink: "",
             pMile: 0,
             pRes: item.a.it[5],
