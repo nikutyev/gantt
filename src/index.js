@@ -3,6 +3,7 @@ import MicroModal from 'micromodal';
 
 import {ru} from "./lang.js";
 import {a} from "./response.js";
+import {requestData} from "./requestHelper";
 
 import "./jsgantt.css";
 import "./main.css";
@@ -172,3 +173,5 @@ hideOldSelect.addEventListener("change", (e) => {
 
 buildModalList();
 setFirstItemSelected();
+
+requestData();
