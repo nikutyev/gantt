@@ -2,7 +2,7 @@ import JSGantt from 'jsgantt-improved';
 import MicroModal from 'micromodal';
 
 import {ru} from "./lang.js";
-import {a} from "./response.js";
+import {getData} from "./requestHelper";
 
 import "./jsgantt.css";
 import "./main.css";
@@ -14,9 +14,9 @@ const acceptedSelect = document.querySelector("#accepted_select");
 const expandSelect = document.querySelector("#expand_select");
 const hideOldSelect = document.querySelector("#hide_old_select");
 
-const res = JSON.parse(a);
+const data = getData();
 
-const array = res.OpenDimResult.meta.els.els.e;
+const array = data.OpenDimResult.meta.els.els.e;
 
 const displaySettings = {
     acceptedStatus: null,
