@@ -1,5 +1,5 @@
 const LOCAL_STORAGE_KEY = "prognozToken";
-const URL = "https://putsreq.com/81dvL1vyflbJIqJ2L0J9";
+const URL = "https://prognoz48.admlr.lipetsk.ru/PP_App_v8.0/app/PPService.axd";
 
 function authorize() {
     const xhr = new XMLHttpRequest();
