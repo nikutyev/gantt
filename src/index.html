@@ -5,39 +5,42 @@
     <title>Title</title>
 </head>
 <body>
-<div>
-    <label for="accepted_select">Статус согласования</label>
-    <div class="select">
-        <select id="accepted_select">
-            <option value="" selected>Все</option>
-            <option value="0">Отклонено</option>
-            <option value="1">Согласовано</option>
-            <option value="2">Не заполнено</option>
-            <option value="3">Ожидает согласования</option>
-        </select>
-        <span class="focus"></span>
+    <div class="select-group">
+        <div class="select-container">
+            <label for="accepted_select">Статус согласования</label>
+            <div class="select">
+                <select id="accepted_select">
+                    <option value="" selected>Все</option>
+                    <option value="0">Отклонено</option>
+                    <option value="1">Согласовано</option>
+                    <option value="2">Не заполнено</option>
+                    <option value="3">Ожидает согласования</option>
+                </select>
+                <span class="focus"></span>
+            </div>
+        </div>
+        <div class="select-container">
+            <label for="expand_select">Раскрыть все</label>
+            <div class="select">
+                <select id="expand_select">
+                    <option value="" selected>Нет</option>
+                    <option value="true">Да</option>
+                </select>
+                <span class="focus"></span>
+            </div>
+        </div>
+        <div class="select-container">
+            <label for="hide_old_select">Скрыть прошедшие</label>
+            <div class="select">
+                <select id="hide_old_select">
+                    <option value="" selected>Нет</option>
+                    <option value="true">Да</option>
+                </select>
+                <span class="focus"></span>
+            </div>
+        </div>
     </div>
-</div>
-<div>
-    <label for="expand_select">Раскрыть все</label>
-    <div class="select">
-        <select id="expand_select">
-            <option value="" selected>Нет</option>
-            <option value="true">Да</option>
-        </select>
-        <span class="focus"></span>
-    </div>
-</div>
-<div>
-    <label for="hide_old_select">Скрыть прошедшие</label>
-    <div class="select">
-        <select id="hide_old_select">
-            <option value="" selected>Нет</option>
-            <option value="true">Да</option>
-        </select>
-        <span class="focus"></span>
-    </div>
-</div>
+
 <div class="parent_container">
     <span id="parent_elements" class="parent-text clickable"></span>
 </div>
