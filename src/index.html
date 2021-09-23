@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
+<div class="wrapper">
     <div class="select-group">
         <div class="select-container">
             <label for="accepted_select">Статус согласования</label>
@@ -40,24 +42,25 @@
             </div>
         </div>
     </div>
-
-<div class="parent_container">
-    <span id="parent_elements" class="parent-text clickable"></span>
-</div>
-<div style="position:relative" class="gantt" id="GanttChartDIV"></div>
-<div class="modal micromodal-slide" id="modal-1" aria-hidden="true">
-    <div class="modal__overlay" tabindex="-1" data-micromodal-close>
-        <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
-            <header class="modal__header">
-                <h2 class="modal__title" id="modal-1-title">
-                    Проекты
-                </h2>
-                <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
-            </header>
-            <main class="modal__content" id="modal-1-content">
-                <ul id="modal_list">
-                </ul>
-            </main>
+    
+    <div class="parent_container">
+        <span id="parent_elements" class="parent-text clickable"></span>
+    </div>
+    <div style="position:relative" class="gantt" id="GanttChartDIV"></div>
+    <div class="modal micromodal-slide" id="modal-1" aria-hidden="true">
+        <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+            <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
+                <header class="modal__header">
+                    <h2 class="modal__title" id="modal-1-title">
+                        Проекты
+                    </h2>
+                    <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+                </header>
+                <main class="modal__content" id="modal-1-content">
+                    <ul id="modal_list">
+                    </ul>
+                </main>
+            </div>
         </div>
     </div>
 </div>
