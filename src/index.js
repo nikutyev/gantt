@@ -126,7 +126,7 @@ function setParentElementsText(key) {
   let text = item.n;
   while (item.p && item.p.length > 0) {
     item = array[getItemIndex(item.p)];
-    text = item.n + " > " + text;
+    text = "<span>" + item.n + "</span>" + "<span>" + text + "</span>";
   }
   parentElementsText.innerHTML = text;
 }

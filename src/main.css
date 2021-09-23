@@ -37,10 +37,33 @@ ul {
 .parent-text {
   display: inline-block;
   margin: 20px 0;
-  padding: 10px 14px;
+}
+
+.parent-text span {
+  display: inline-block;
+  padding: 8px 12px;
   border-radius: 10px;
   background-color: #e7f1ff;
   color: #0c63e4;
+}
+
+.parent-text span + span {
+  margin-left: 20px;
+  position: relative;
+}
+
+.parent-text span + span:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+  left: -16px;
+  display: block;
+  background-image: url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27 fill=%27%23212529%27%3e%3cpath fill-rule=%27evenodd%27 d=%27M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z%27/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-size: 12px;
+  width: 12px;
+  height: 12px;
 }
 
 .parent_container {
@@ -52,6 +75,10 @@ h2.modal__title {
   color: #212529;
 }
 
+.modal__header {
+  margin-left: 10px;
+}
+
 .modal__overlay {
   z-index: 2;
 }
@@ -59,6 +86,12 @@ h2.modal__title {
 .modal__close {
   outline: none;
   cursor: pointer;
+  padding-right: 0;
+}
+
+.modal__header .modal__close:before {
+  font-weight: bold;
+  font-size: 24px;
 }
 
 .modal__overlay .modal__container {
@@ -189,7 +222,7 @@ select {
     rgba(75, 184, 240, 1) 0%,
     rgba(65, 154, 214, 1) 33.333333%,
     rgba(58, 132, 195, 1) 66.666666%,
-    rgba(38, 85, 139, 1) 100%
+    #0c63e4 100%
   );
 }
 /*.gtaskblue2 {*/
@@ -198,7 +231,7 @@ select {
 /*}*/
 
 #modal_list {
-  padding: 0;
+  padding: 10px;
   margin-top: 0;
   margin-bottom: 0;
   margin-right: 20px;
@@ -270,6 +303,7 @@ select {
   background-color: #e7f1ff;
   border-color: #86b7fe;
   border-top: 1px solid #86b7fe;
+  box-shadow: 0 0 0 0.15rem rgb(13 110 253 / 25%);
 }
 
 .modal_sublist {
@@ -283,7 +317,20 @@ select {
 }
 
 .list-child {
-  padding: 8px 16px;
+  padding: 10px 28px;
+  position: relative;
+}
+.list-child::before {
+  content: "";
+  position: absolute;
+  top: 18px;
+  left: 12px;
+  display: inline-block;
+  margin-right: 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #0c63e4;
 }
 .list-child:hover {
   color: #0c63e4;
