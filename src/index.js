@@ -1,8 +1,8 @@
 import JSGantt from "jsgantt-improved";
 import MicroModal from "micromodal";
 
-import { ru } from "./lang.js";
-import { getData } from "./requestHelper";
+import {ru} from "./lang.js";
+import {getData, LOCAL_STORAGE_KEY} from "./requestHelper";
 
 import "./jsgantt.css";
 import "./main.css";
@@ -12,8 +12,13 @@ const parentElementsText = document.querySelector("#parent_elements");
 const acceptedSelect = document.querySelector("#accepted_select");
 const expandSelect = document.querySelector("#expand_select");
 const hideOldSelect = document.querySelector("#hide_old_select");
+const showAdditionalInfoSelect = document.querySelector("#show_additional_info_select");
+const showPredictedDateSelect = document.querySelector("#show_predicted_date_select");
+const objectsSelect = document.querySelector("#objects_select");
 
-const data = getData();
+// TODO remove require
+const data = require("./response.json");
+// const data = getData();
 
 const array = data.OpenDimResult.meta.els.els.e;
 
@@ -21,6 +26,9 @@ const displaySettings = {
   acceptedStatus: null,
   hideOldTasks: false,
   expandAll: false,
+  showAdditionalInfo: false,
+  showPredictedDate: false,
+  object: null,
 };
 
 const pItems = [];
@@ -61,14 +69,14 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
   g.setDateTaskTableDisplayFormat("dd.mm.yyyy");
   g.setShowRes(0);
   g.setShowTaskInfoRes(0);
-  g.setShowTaskInfoNotes(0);
+  g.setShowTaskInfoNotes(settings.showAdditionalInfo ? 1 : 0);
   g.setShowComp(0);
   g.setShowTaskInfoComp(0);
   g.setShowPlanStartDate(0);
-  g.setShowPlanEndDate(0);
-  g.setShowStartDate(0);
-  g.setShowEndDate(0);
-  g.setShowDur(0);
+  g.setShowPlanEndDate(settings.showPredictedDate ? 1 : 0);
+  g.setShowStartDate(1);
+  g.setShowEndDate(1);
+  g.setShowDur(1);
 
   let index = getItemIndex(parentKey) + 1;
   let items = [];
@@ -80,12 +88,29 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
     index++;
   }
 
+  buildObjectsSelect(items, settings.object);
+
   const today = new Date();
   items = items.filter(
     (item) =>
       (!settings.acceptedStatus || item.a.it[8] == settings.acceptedStatus) &&
-      (!settings.hideOldTasks || new Date(item.a.it[4]) > today)
+      (!settings.hideOldTasks || (new Date(item.a.it[4]) > today && item.a.it[8] == 1))
   );
+
+  // по объекту фильтрация отдельно
+  let children = false;
+  if (settings.object) {
+    let newItems = [];
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].k === settings.object)
+        children = true;
+      else if (items[i].o === 2)
+        children = false;
+      if (children)
+        newItems.push(items[i]);
+    }
+    items = newItems;
+  }
 
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
@@ -93,11 +118,20 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
     const level = parseInt(item.a.it[7]);
     // const accepted = item.a.it[8];
 
+    let notes = "";
+    if (settings.showAdditionalInfo) {
+      notes = "Заказчик: " + item.a.it[11] + "<br>"
+        + "Подрядчик: " + item.a.it[12] + "<br>"
+        + "Комментарий: " + item.a.it[13];
+    }
+
     g.AddTaskItemObject({
       pID: parseInt(item.k),
       pName: item.n,
       pStart: item.a.it[3],
       pEnd: item.a.it[4],
+      pPlanStart: settings.showPredictedDate ? item.a.it[3] : "",
+      pPlanEnd: settings.showPredictedDate ? item.a.it[14] : "",
       pClass:
         item.o - 1 < 4 && item.o - 1 > 0
           ? "gtaskblue" + (item.o - 1)
@@ -112,9 +146,9 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
           ? parseInt(item.p)
           : 0,
       pOpen: settings.expandAll ? 1 : 0,
-      pDepend: "",
+      pDepend: item.a.it[10] ? item.a.it[10].split(" ") : "",
       pCaption: "",
-      pNotes: "",
+      pNotes: notes,
     });
   }
 
@@ -180,6 +214,26 @@ function buildModalList() {
   }
 }
 
+function buildObjectsSelect(items, selected) {
+  objectsSelect.innerHTML = "";
+  const option = document.createElement("option");
+  option.selected = !selected;
+  option.innerHTML = "Все";
+  option.value = "";
+  objectsSelect.appendChild(option);
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    const next = items[i + 1];
+    if (next && item.k === next.p && item.o == 2){
+      const option = document.createElement("option");
+      option.selected = item.k === selected;
+      option.innerHTML = item.n;
+      option.value = item.k;
+      objectsSelect.appendChild(option);
+    }
+  }
+}
+
 parentElementsText.addEventListener("click", () => {
   MicroModal.show("modal-1");
 });
@@ -195,6 +249,26 @@ hideOldSelect.addEventListener("change", (e) => {
   displaySettings.hideOldTasks = e.target.value;
   redraw();
 });
+showAdditionalInfoSelect.addEventListener("change", (e) => {
+  displaySettings.showAdditionalInfo = e.target.value;
+  redraw();
+});
+showPredictedDateSelect.addEventListener("change", (e) => {
+  displaySettings.showPredictedDate = e.target.value;
+  redraw();
+});
+objectsSelect.addEventListener("change", (e) => {
+  displaySettings.object = e.target.value;
+  redraw();
+});
 
 buildModalList();
 setFirstItemSelected();
+
+// сбрасывает сессию в прогнозе, обновляя связи
+document.addEventListener("keypress", (e) => {
+  if (e.key.toLowerCase() === "r" || e.key.toLowerCase() === "к") {
+    localStorage.setItem(LOCAL_STORAGE_KEY, "");
+    document.location.reload();
+  }
+});

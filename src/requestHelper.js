@@ -96,5 +96,5 @@ function getData() {
     return data;
 }
 
-export {getData};
+export {getData, LOCAL_STORAGE_KEY};
 

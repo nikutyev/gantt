@@ -26,6 +26,27 @@ ul {
 .gtaskname {
   width: 400px;
   max-width: 400px;
+}
+
+.gdur div,
+.gstartdate div,
+.genddate div,
+.gplanenddate div {
+  font-size: 14px;
+}
+
+.gtaskheading {
+  font-size: 14px;
+}
+
+.gtaskbarcontainer.gplan {
+  z-index: 1;
+  position: absolute;
+  top: 0px;
+
+}
+
+.gTaskNotes {
   font-size: 12px;
 }
 
@@ -67,7 +88,7 @@ ul {
 }
 
 .parent_container {
-  margin-top: 20px;
+  /*margin-top: 20px;*/
   margin-bottom: 20px;
 }
 
@@ -204,15 +225,17 @@ select {
   margin-left: 1rem;
 }
 
+.gtaskblue,
 .gtaskblue1,
 .gtaskblue2,
 .gtaskblue3 {
-  height: 13px;
+  height: 18px;
   filter: alpha(opacity=90);
   opacity: 0.9;
-  margin-top: 1px;
+  margin-top: -4px;
 }
 
+.gtaskblue,
 .gtaskblue1,
 .gtaskblue2,
 .gtaskblue3 {

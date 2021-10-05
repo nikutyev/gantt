@@ -2,12 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Gantt</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
 <div class="wrapper">
+    <div class="parent_container">
+        <span id="parent_elements" class="parent-text clickable"></span>
+    </div>
+
     <div class="select-group">
+        <div class="select-container">
+            <label for="objects_select">Объект</label>
+            <div class="select">
+                <select id="objects_select">
+                    <option value="" selected>Все</option>
+                </select>
+                <span class="focus"></span>
+            </div>
+        </div>
         <div class="select-container">
             <label for="accepted_select">Статус согласования</label>
             <div class="select">
@@ -41,11 +54,28 @@
                 <span class="focus"></span>
             </div>
         </div>
+        <div class="select-container">
+            <label for="show_predicted_date_select">Прогнозируемое окончание</label>
+            <div class="select">
+                <select id="show_predicted_date_select">
+                    <option value="" selected>Скрыть</option>
+                    <option value="true">Показать</option>
+                </select>
+                <span class="focus"></span>
+            </div>
+        </div>
+        <div class="select-container">
+            <label for="show_additional_info_select">Дополнительная информация</label>
+            <div class="select">
+                <select id="show_additional_info_select">
+                    <option value="" selected>Скрыть</option>
+                    <option value="true">Показать</option>
+                </select>
+                <span class="focus"></span>
+            </div>
+        </div>
     </div>
-    
-    <div class="parent_container">
-        <span id="parent_elements" class="parent-text clickable"></span>
-    </div>
+
     <div style="position:relative" class="gantt" id="GanttChartDIV"></div>
     <div class="modal micromodal-slide" id="modal-1" aria-hidden="true">
         <div class="modal__overlay" tabindex="-1" data-micromodal-close>
