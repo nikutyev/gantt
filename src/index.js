@@ -1,8 +1,10 @@
 import JSGantt from "jsgantt-improved";
 import MicroModal from "micromodal";
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
 
-import {ru} from "./lang.js";
-import {getData, LOCAL_STORAGE_KEY} from "./requestHelper";
+import { ru } from "./lang.js";
+import { getData, LOCAL_STORAGE_KEY } from "./requestHelper";
 
 import "./jsgantt.css";
 import "./main.css";
@@ -12,8 +14,12 @@ const parentElementsText = document.querySelector("#parent_elements");
 const acceptedSelect = document.querySelector("#accepted_select");
 const expandSelect = document.querySelector("#expand_select");
 const hideOldSelect = document.querySelector("#hide_old_select");
-const showAdditionalInfoSelect = document.querySelector("#show_additional_info_select");
-const showPredictedDateSelect = document.querySelector("#show_predicted_date_select");
+const showAdditionalInfoSelect = document.querySelector(
+  "#show_additional_info_select"
+);
+const showPredictedDateSelect = document.querySelector(
+  "#show_predicted_date_select"
+);
 const objectsSelect = document.querySelector("#objects_select");
 
 // TODO remove require
@@ -57,8 +63,8 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
     vCaptionType: "Complete",
     vQuarterColWidth: 36,
     vDateTaskDisplayFormat: "dd.mm.yyyy",
-    vDayMajorDateDisplayFormat: "mon yyyy - Week ww",
-    vWeekMinorDateDisplayFormat: "dd mon",
+    vDayMajorDateDisplayFormat: "mon.yyyy - Week ww",
+    vWeekMinorDateDisplayFormat: "dd.mon",
     vLang: "ru1",
     vShowTaskInfoLink: 0,
     vShowEndWeekDate: 0,
@@ -94,7 +100,8 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
   items = items.filter(
     (item) =>
       (!settings.acceptedStatus || item.a.it[8] == settings.acceptedStatus) &&
-      (!settings.hideOldTasks || (new Date(item.a.it[4]) > today && item.a.it[8] == 1))
+      (!settings.hideOldTasks ||
+        (new Date(item.a.it[4]) > today && item.a.it[8] == 1))
   );
 
   // по объекту фильтрация отдельно
@@ -102,12 +109,9 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
   if (settings.object) {
     let newItems = [];
     for (let i = 0; i < items.length; i++) {
-      if (items[i].k === settings.object)
-        children = true;
-      else if (items[i].o === 2)
-        children = false;
-      if (children)
-        newItems.push(items[i]);
+      if (items[i].k === settings.object) children = true;
+      else if (items[i].o === 2) children = false;
+      if (children) newItems.push(items[i]);
     }
     items = newItems;
   }
@@ -120,9 +124,15 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
 
     let notes = "";
     if (settings.showAdditionalInfo) {
-      notes = "Заказчик: " + item.a.it[11] + "<br>"
-        + "Подрядчик: " + item.a.it[12] + "<br>"
-        + "Комментарий: " + item.a.it[13];
+      notes =
+        "Заказчик: " +
+        item.a.it[11] +
+        "<br>" +
+        "Подрядчик: " +
+        item.a.it[12] +
+        "<br>" +
+        "Комментарий: " +
+        item.a.it[13];
     }
 
     g.AddTaskItemObject({
@@ -151,7 +161,6 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
       pNotes: notes,
     });
   }
-
   g.Draw();
 }
 
@@ -224,7 +233,7 @@ function buildObjectsSelect(items, selected) {
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     const next = items[i + 1];
-    if (next && item.k === next.p && item.o == 2){
+    if (next && item.k === next.p && item.o == 2) {
       const option = document.createElement("option");
       option.selected = item.k === selected;
       option.innerHTML = item.n;
@@ -265,10 +274,70 @@ objectsSelect.addEventListener("change", (e) => {
 buildModalList();
 setFirstItemSelected();
 
+function updateSession() {
+  localStorage.setItem(LOCAL_STORAGE_KEY, "");
+  document.location.reload();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const updateSessionBtnEl = document.getElementById("updateSession");
+
+  updateSessionBtnEl.addEventListener("click", (e) => {
+    updateSession();
+  });
+});
+
 // сбрасывает сессию в прогнозе, обновляя связи
 document.addEventListener("keypress", (e) => {
   if (e.key.toLowerCase() === "r" || e.key.toLowerCase() === "к") {
-    localStorage.setItem(LOCAL_STORAGE_KEY, "");
-    document.location.reload();
+    updateSession();
   }
+});
+
+const saveToPdf = document.getElementById("saveToPdf");
+
+saveToPdf.addEventListener("click", () => {
+  const wrapper = document.querySelector(".wrapper");
+
+  html2canvas(wrapper).then(function (canvas) {
+    // a4 альбомный формат [841.89, 595.28]
+    const A4_HEIGHT = 592.28;
+    const A4_WIDTH = 841.89;
+    const contentWidth = canvas.width;
+    const contentHeight = canvas.height;
+
+    // высота канваса, которая помещается на одну страницу pdf
+    let pageHeight = (contentWidth / A4_WIDTH) * A4_HEIGHT;
+    // высота канваса, которая не помещается
+    let leftHeight = contentHeight;
+    // сдвиг по оси y
+    let position = 0;
+
+    var imgWidth = A4_WIDTH;
+    var imgHeight = (A4_WIDTH / contentWidth) * contentHeight;
+
+    var pageData = canvas.toDataURL("image/jpeg", 1.0);
+
+    const pdf = new jsPDF({
+      unit: "pt",
+      orientation: "landscape",
+      format: "a4",
+    });
+
+    if (leftHeight < pageHeight) {
+      pdf.addImage(pageData, "JPEG", 0, 0, imgWidth, imgHeight);
+    } else {
+      while (leftHeight > 0) {
+        pdf.addImage(pageData, "JPEG", 0, position, imgWidth, imgHeight);
+        leftHeight -= pageHeight;
+        position -= A4_HEIGHT;
+        //убираем пустую страницу
+        if (leftHeight > 0) {
+          pdf.addPage();
+        }
+      }
+    }
+
+    pdf.save("Отчёт.pdf");
+  });
 });
