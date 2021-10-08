@@ -1,7 +1,7 @@
 import JSGantt from "jsgantt-improved";
 import MicroModal from "micromodal";
 import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas";
+import html2canvas from "./html2canvas";
 
 import { ru } from "./lang.js";
 import { getData, LOCAL_STORAGE_KEY } from "./requestHelper";
