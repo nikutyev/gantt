@@ -14,13 +14,10 @@ const parentElementsText = document.querySelector("#parent_elements");
 const acceptedSelect = document.querySelector("#accepted_select");
 const expandSelect = document.querySelector("#expand_select");
 const hideOldSelect = document.querySelector("#hide_old_select");
-const showAdditionalInfoSelect = document.querySelector(
-  "#show_additional_info_select"
-);
-const showPredictedDateSelect = document.querySelector(
-  "#show_predicted_date_select"
-);
+const showAdditionalInfoSelect = document.querySelector("#show_additional_info_select");
+const showPredictedDateSelect = document.querySelector("#show_predicted_date_select");
 const objectsSelect = document.querySelector("#objects_select");
+const showBaseVersionSelect = document.querySelector("#show_base_version_select");
 
 // TODO remove require
 const data = require("./response.json");
@@ -35,6 +32,7 @@ const displaySettings = {
   showAdditionalInfo: false,
   showPredictedDate: false,
   object: null,
+  showBaseVersion: false,
 };
 
 const pItems = [];
@@ -138,14 +136,11 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
     g.AddTaskItemObject({
       pID: parseInt(item.k),
       pName: item.n,
-      pStart: item.a.it[3],
-      pEnd: item.a.it[4],
+      pStart: settings.showBaseVersion ? item.a.it[15] : item.a.it[3],
+      pEnd: settings.showBaseVersion ? item.a.it[16] : item.a.it[4],
       pPlanStart: settings.showPredictedDate ? item.a.it[3] : "",
       pPlanEnd: settings.showPredictedDate ? item.a.it[14] : "",
-      pClass:
-        item.o - 1 < 4 && item.o - 1 > 0
-          ? "gtaskblue" + (item.o - 1)
-          : "gtaskblue",
+      pClass: settings.showBaseVersion ? "gtaskgrey" : "gtaskblue",
       pLink: "",
       pMile: 0,
       pRes: item.a.it[5],
@@ -268,6 +263,10 @@ showPredictedDateSelect.addEventListener("change", (e) => {
 });
 objectsSelect.addEventListener("change", (e) => {
   displaySettings.object = e.target.value;
+  redraw();
+});
+showBaseVersionSelect.addEventListener("change", (e) => {
+  displaySettings.showBaseVersion = e.target.value;
   redraw();
 });
 
