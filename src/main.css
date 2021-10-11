@@ -54,6 +54,14 @@ ul {
   z-index: 1;
   position: absolute;
   top: 0px;
+  border: none !important;
+}
+
+.gplan {
+  opacity: 1 !important;
+  background: #c8c8c8 !important;
+  height: 4px !important;
+  margin-top: 4px;
 }
 
 .gTaskNotes {
