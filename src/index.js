@@ -2,6 +2,7 @@ import JSGantt from "jsgantt-improved";
 import MicroModal from "micromodal";
 import { jsPDF } from "jspdf";
 import html2canvas from "./html2canvas";
+import autoComplete from "@tarekraafat/autocomplete.js";
 
 import { ru } from "./lang.js";
 import { getData, LOCAL_STORAGE_KEY } from "./requestHelper";
@@ -9,7 +10,13 @@ import { getData, LOCAL_STORAGE_KEY } from "./requestHelper";
 import "./jsgantt.css";
 import "./main.css";
 import "./micromodal.css";
+import "./autocomplete.css";
 
+function onClose(modal) {
+  closeAccordion();
+}
+
+let dataObjects = [];
 const parentElementsText = document.querySelector("#parent_elements");
 const acceptedSelect = document.querySelector("#accepted_select");
 const expandSelect = document.querySelector("#expand_select");
@@ -61,7 +68,9 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
 
   g.setOptions({
     vCaptionType: "Complete",
-    vQuarterColWidth: 36,
+    vQuarterColWidth: 50,
+    vMonthColWidth: 50,
+    vWeekColWidth: 40,
     vDateTaskDisplayFormat: "dd.mm.yyyy",
     vDayMajorDateDisplayFormat: "mon.yyyy - Week ww",
     vWeekMinorDateDisplayFormat: "dd.mon",
@@ -95,6 +104,7 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
   }
 
   buildObjectsSelect(items, settings.object);
+  dataObjects = buildData(items);
 
   const today = new Date();
   items = items.filter(
@@ -243,8 +253,23 @@ function buildObjectsSelect(items, selected) {
   }
 }
 
+function buildData(items) {
+  const data = [];
+  for (let i = 0; i < pItems.length; i++) {
+    const item = pItems[i];
+    const next = pItems[i + 1];
+
+    if (!next || item.k !== next.p) {
+      data.push({ name: item.n, id: item.k });
+    }
+  }
+  return data;
+}
+
 parentElementsText.addEventListener("click", () => {
-  MicroModal.show("modal-1");
+  MicroModal.show("modal-1", {
+    onClose: onClose,
+  });
 });
 acceptedSelect.addEventListener("change", (e) => {
   displaySettings.acceptedStatus = e.target.value;
@@ -274,6 +299,14 @@ objectsSelect.addEventListener("change", (e) => {
 buildModalList();
 setFirstItemSelected();
 
+function closeAccordion() {
+  const activeTabs = document.querySelectorAll(".modal_list-title.active");
+
+  activeTabs.forEach((item) => {
+    item.click();
+  });
+}
+
 function updateSession() {
   localStorage.setItem(LOCAL_STORAGE_KEY, "");
   document.location.reload();
@@ -287,57 +320,167 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// сбрасывает сессию в прогнозе, обновляя связи
-document.addEventListener("keypress", (e) => {
-  if (e.key.toLowerCase() === "r" || e.key.toLowerCase() === "к") {
-    updateSession();
-  }
-});
-
 const saveToPdf = document.getElementById("saveToPdf");
+
+const tableBodyLeft = document.querySelector(".gmainleft .gtasktablewrapper");
+const tableBodyRight = document.querySelector(
+  ".gmainright #GanttChartDIVgchartbody"
+);
+const gantt = document.querySelector("#GanttChartDIV");
 
 saveToPdf.addEventListener("click", () => {
   const wrapper = document.querySelector(".wrapper");
+  var headerCanvas = null;
 
-  html2canvas(wrapper).then(function (canvas) {
-    // a4 альбомный формат [841.89, 595.28]
-    const A4_HEIGHT = 592.28;
-    const A4_WIDTH = 841.89;
-    const contentWidth = canvas.width;
-    const contentHeight = canvas.height;
-
-    // высота канваса, которая помещается на одну страницу pdf
-    let pageHeight = (contentWidth / A4_WIDTH) * A4_HEIGHT;
-    // высота канваса, которая не помещается
-    let leftHeight = contentHeight;
-    // сдвиг по оси y
-    let position = 0;
-
-    var imgWidth = A4_WIDTH;
-    var imgHeight = (A4_WIDTH / contentWidth) * contentHeight;
-
-    var pageData = canvas.toDataURL("image/jpeg", 1.0);
-
-    const pdf = new jsPDF({
-      unit: "pt",
-      orientation: "landscape",
-      format: "a4",
-    });
-
-    if (leftHeight < pageHeight) {
-      pdf.addImage(pageData, "JPEG", 0, 0, imgWidth, imgHeight);
-    } else {
-      while (leftHeight > 0) {
-        pdf.addImage(pageData, "JPEG", 0, position, imgWidth, imgHeight);
-        leftHeight -= pageHeight;
-        position -= A4_HEIGHT;
-        //убираем пустую страницу
-        if (leftHeight > 0) {
-          pdf.addPage();
-        }
-      }
+  document.querySelectorAll(".gname.glineitem").forEach((item) => {
+    if (item.getBoundingClientRect().top > 1106) {
+      item.style.background = "#black";
+      return false;
     }
-
-    pdf.save("Отчёт.pdf");
   });
+
+  const headerGanttConfig = {
+    height: 80,
+    x: 0,
+    y: 0,
+  };
+
+  const wrapperConfig = {
+    onclone: (el) => {
+      const cloneDosumentWidth = 1920;
+      const wrapperClone = el.querySelector(".wrapper");
+      const ganttClone = wrapperClone.querySelector(".gantt");
+      const leftSideGanttClone = ganttClone.querySelector(".gmainleft");
+      const quarterBtn = ganttClone.querySelector(
+        "#GanttChartDIVformatquartertop"
+      );
+      const taskName = ganttClone.querySelectorAll(
+        ".gtasktable .gname .gtaskname div"
+      );
+      const footerLeft = ganttClone.querySelector(
+        ".gmainleft .gtasktable tbody tr:last-child"
+      );
+      const footerRight = ganttClone.querySelector(
+        ".gmainright .gcharttable tfoot .footerdays"
+      );
+      const gChartClone = gantt.querySelector(".gcharttable");
+      const gRightCloneWidth = parseInt(gChartClone.style.width);
+      const gLeftSideWidth = parseInt(leftSideGanttClone.style.width);
+
+      const commonWidth = gRightCloneWidth + gLeftSideWidth;
+      const marginLeft = (cloneDosumentWidth - commonWidth) / 2;
+
+      //ganttClone.style.marginLeft = `${marginLeft}px`;
+
+      wrapperClone.style.width = `${cloneDosumentWidth}px`;
+
+      footerLeft.style.display = "none";
+      footerRight.style.display = "none";
+    },
+  };
+
+  tableBodyLeft.setAttribute("data-html2canvas-ignore", true);
+  tableBodyRight.setAttribute("data-html2canvas-ignore", true);
+
+  html2canvas(gantt, headerGanttConfig)
+    .then((canvas) => {
+      headerCanvas = canvas;
+      tableBodyLeft.removeAttribute("data-html2canvas-ignore");
+      tableBodyRight.removeAttribute("data-html2canvas-ignore");
+    })
+    .then(() => {
+      html2canvas(wrapper, wrapperConfig).then((canvas) => {
+        // a4 альбомный формат [841.89, 595.28]
+        const A4_HEIGHT = 593;
+        const A4_WIDTH = 842;
+        const contentWidth = canvas.width;
+        const contentHeight = canvas.height;
+
+        // высота канваса, которая помещается на одну страницу pdf
+        let pageHeight = (contentWidth / A4_WIDTH) * A4_HEIGHT;
+        // высота канваса, которая не помещается
+        let leftHeight = contentHeight;
+        // сдвиг по оси y
+        let position = 2;
+
+        const imgWidth = A4_WIDTH;
+        const imgHeight = (A4_WIDTH / contentWidth) * contentHeight;
+
+        const pageData = canvas.toDataURL("image/jpg", 1.0);
+        const headerGanttData = headerCanvas.toDataURL("img/jpg", 1.0);
+
+        let currentPage = 1;
+        const pages = Math.ceil(contentHeight / pageHeight);
+
+        const headerGanttHeight = Math.floor(
+          (A4_WIDTH / contentWidth) * headerCanvas.height
+        );
+
+        const pdf = new jsPDF({
+          unit: "pt",
+          orientation: "landscape",
+          format: "a4",
+        });
+
+        if (leftHeight < pageHeight) {
+          pdf.addImage(pageData, "JPEG", 0, 0, imgWidth, imgHeight);
+        } else {
+          while (leftHeight > 0) {
+            if (currentPage === 1) {
+              pdf.addImage(pageData, "JPEG", 0, 2, imgWidth, imgHeight);
+            } else {
+              pdf.addImage(pageData, "JPEG", 0, position, imgWidth, imgHeight);
+              pdf.addImage(
+                headerGanttData,
+                "JPEG",
+                0,
+                0,
+                imgWidth,
+                headerGanttHeight
+              );
+            }
+
+            leftHeight -= pageHeight;
+            position -= A4_HEIGHT - headerGanttHeight + currentPage;
+            currentPage += 1;
+            // убираем пустую страницу
+            if (leftHeight > 0) {
+              pdf.addPage();
+            }
+          }
+        }
+
+        pdf.save("Отчёт.pdf");
+      });
+    });
+});
+
+const autoCompleteJS = new autoComplete({
+  selector: "#autocomplete",
+  data: {
+    src: dataObjects,
+    keys: ["name"],
+  },
+  resultList: {
+    class: "autoComplete_list",
+  },
+  resultItem: {
+    tag: "li",
+    class: "autoComplete_result",
+    highlight: "autoComplete_highlight",
+    selected: "autoComplete_selected",
+  },
+  tabSelection: true,
+  events: {
+    input: {
+      selection: (event) => {
+        const selection = event.detail.selection.value.name;
+        const id = event.detail.selection.value.id;
+
+        autoCompleteJS.input.value = selection;
+        setParentElementsText(parseInt(id));
+        redraw(parseInt(id));
+      },
+    },
+  },
 });
