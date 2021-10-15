@@ -1,0 +1,16 @@
+.autoComplete_wrapper ul {
+  box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.125);
+  border: 1px solid rgb(118, 118, 118);
+}
+.autoComplete_result {
+  padding: 0px 0.5rem;
+  font-size: 16px;
+  line-height: 1.45;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.autoComplete_result:hover {
+  background-color: rgb(30, 144, 255);
+  color: white;
+}

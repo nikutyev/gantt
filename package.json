@@ -21,6 +21,7 @@
     "webpack-dev-server": "^4.1.0"
   },
   "dependencies": {
+    "@tarekraafat/autocomplete.js": "^10.2.6",
     "jsgantt-improved": "^2.8.4",
     "jspdf": "^2.4.0",
     "micromodal": "^0.4.6"

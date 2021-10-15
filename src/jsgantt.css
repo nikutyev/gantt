@@ -31,9 +31,8 @@ div.gantt {
   font-size: 12px;
   border: #efefef 1px solid;
   text-align: center;
-  cursor: default
+  cursor: default;
 }
-
 
 .gtasklist {
   height: 19px;
@@ -44,7 +43,7 @@ div.gantt {
   border-right: none;
 }
 
-.gtasknolist-label{
+.gtasknolist-label {
   padding: 10px 50px;
 }
 /* all three width values set just to make sure - helps resizing code */
@@ -373,7 +372,14 @@ span.gfoldercollapse {
 .gtaskblue {
   background: rgb(58, 132, 195);
   /* Old browsers */
-  background: linear-gradient(to bottom, rgba(58, 132, 195, 1) 0%, rgba(65, 154, 214, 1) 20%, rgba(75, 184, 240, 1) 40%, rgba(58, 139, 194, 1) 70%, rgba(38, 85, 139, 1) 100%);
+  background: linear-gradient(
+    to bottom,
+    rgba(58, 132, 195, 1) 0%,
+    rgba(65, 154, 214, 1) 20%,
+    rgba(75, 184, 240, 1) 40%,
+    rgba(58, 139, 194, 1) 70%,
+    rgba(38, 85, 139, 1) 100%
+  );
   /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#4bb8f0', endColorstr='#3a84c3', GradientType=0);
   /* IE6-9 */
@@ -382,7 +388,14 @@ span.gfoldercollapse {
 .gtaskred {
   background: rgb(196, 58, 58);
   /* Old browsers */
-  background: linear-gradient(to bottom, rgba(196, 58, 58, 1) 0%, rgba(211, 65, 65, 1) 20%, rgba(239, 76, 76, 1) 40%, rgba(196, 58, 58, 1) 70%, rgba(135, 37, 37, 1) 100%);
+  background: linear-gradient(
+    to bottom,
+    rgba(196, 58, 58, 1) 0%,
+    rgba(211, 65, 65, 1) 20%,
+    rgba(239, 76, 76, 1) 40%,
+    rgba(196, 58, 58, 1) 70%,
+    rgba(135, 37, 37, 1) 100%
+  );
   /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ef4c4c', endColorstr='#c43a3a', GradientType=0);
   /* IE6-9 */
@@ -391,7 +404,14 @@ span.gfoldercollapse {
 .gtaskgreen {
   background: rgb(80, 193, 58);
   /* Old browsers */
-  background: linear-gradient(to bottom, rgba(80, 193, 58, 1) 0%, rgba(88, 209, 64, 1) 20%, rgba(102, 237, 75, 1) 40%, rgba(80, 193, 58, 1) 70%, rgba(53, 132, 37, 1) 100%);
+  background: linear-gradient(
+    to bottom,
+    rgba(80, 193, 58, 1) 0%,
+    rgba(88, 209, 64, 1) 20%,
+    rgba(102, 237, 75, 1) 40%,
+    rgba(80, 193, 58, 1) 70%,
+    rgba(53, 132, 37, 1) 100%
+  );
   /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#66ED4B', endColorstr='#50c13a', GradientType=0);
   /* IE6-9 */
@@ -400,7 +420,14 @@ span.gfoldercollapse {
 .gtaskyellow {
   background: rgb(247, 228, 56);
   /* Old browsers */
-  background: linear-gradient(to bottom, rgba(247, 228, 56, 1) 0%, rgba(239, 239, 55, 1) 20%, rgba(255, 255, 58, 1) 40%, rgba(242, 236, 55, 1) 70%, rgba(241, 218, 54, 1) 100%);
+  background: linear-gradient(
+    to bottom,
+    rgba(247, 228, 56, 1) 0%,
+    rgba(239, 239, 55, 1) 20%,
+    rgba(255, 255, 58, 1) 40%,
+    rgba(242, 236, 55, 1) 70%,
+    rgba(241, 218, 54, 1) 100%
+  );
   /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffff3a', endColorstr='#f7e438', GradientType=0);
   /* IE6-9 */
@@ -409,7 +436,14 @@ span.gfoldercollapse {
 .gtaskpurple {
   background: rgb(193, 58, 193);
   /* Old browsers */
-  background: linear-gradient(to bottom, rgba(193, 58, 193, 1) 0%, rgba(211, 65, 211, 1) 20%, rgba(239, 76, 239, 1) 40%, rgba(193, 58, 193, 1) 70%, rgba(137, 38, 137, 1) 100%);
+  background: linear-gradient(
+    to bottom,
+    rgba(193, 58, 193, 1) 0%,
+    rgba(211, 65, 211, 1) 20%,
+    rgba(239, 76, 239, 1) 40%,
+    rgba(193, 58, 193, 1) 70%,
+    rgba(137, 38, 137, 1) 100%
+  );
   /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ef4cef', endColorstr='#892689', GradientType=0);
   /* IE6-9 */
@@ -418,7 +452,14 @@ span.gfoldercollapse {
 .gtaskpink {
   background: rgb(249, 177, 245);
   /* Old browsers */
-  background: linear-gradient(to bottom, rgba(249, 177, 245, 1) 0%, rgba(247, 192, 243, 1) 20%, rgba(247, 202, 244, 1) 40%, rgba(249, 192, 246, 1) 70%, rgba(252, 174, 247, 1) 100%);
+  background: linear-gradient(
+    to bottom,
+    rgba(249, 177, 245, 1) 0%,
+    rgba(247, 192, 243, 1) 20%,
+    rgba(247, 202, 244, 1) 40%,
+    rgba(249, 192, 246, 1) 70%,
+    rgba(252, 174, 247, 1) 100%
+  );
   /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f7caf4', endColorstr='#fcaef7', GradientType=0);
   /* IE6-9 */
@@ -487,7 +528,7 @@ span.gfoldercollapse {
 div.gtaskbarcontainer {
   z-index: 1;
   position: absolute;
-  top: 0px
+  top: 0px;
 }
 
 .textbar {
@@ -510,7 +551,7 @@ div.gtaskbarcontainer {
   font-size: 10px;
   display: block;
   background: #ffffff;
-  color: #656565
+  color: #656565;
 }
 
 .gTaskInfo {
@@ -652,7 +693,7 @@ div.gtaskbarcontainer {
 /* Old Internet Explorer version hacks */
 
 .gantt {
-  _height: 100%
+  _height: 100%;
 }
 
 /* otherwise the chart disappears! */
@@ -681,7 +722,7 @@ div.glistgrid {
 
 div.gchartgrid {
   *padding-bottom: 20px;
-  *overflow-y: hidden;
+  overflow-y: hidden;
 }
 
 /* variable height design, no need for vertical scroll */
@@ -777,7 +818,6 @@ td.gspanning div {
 }
 
 @media print {
-
   /* All your print styles go here */
   html,
   .gchartgrid {
@@ -795,8 +835,8 @@ td.gspanning div {
 
   /* Hide scrollbar for IE, Edge and Firefox */
   .gchartcontainer * {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
 
   /* Hide tool-tip */
@@ -957,25 +997,25 @@ td.gspanning div {
   }
 
   table {
-    page-break-after: auto
+    page-break-after: auto;
   }
 
   tr {
     page-break-inside: avoid;
-    page-break-after: auto
+    page-break-after: auto;
   }
 
   td {
     page-break-inside: avoid;
-    page-break-after: auto
+    page-break-after: auto;
   }
 
   thead {
-    display: table-header-group
+    display: table-header-group;
   }
 
   tfoot {
-    display: table-footer-group
+    display: table-footer-group;
   }
 }
 
@@ -996,7 +1036,7 @@ td.gspanning div {
   border-radius: 8px;
   border: 2px solid white;
   /* should match background, can't be transparent */
-  background-color: rgba(0, 0, 0, .5);
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .frame::-webkit-scrollbar-track {
