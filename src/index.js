@@ -479,6 +479,7 @@ const autoCompleteJS = new autoComplete({
 
         autoCompleteJS.input.value = selection;
         setParentElementsText(parseInt(id));
+        displaySettings.object = null;
         redraw(parseInt(id));
       },
     },
