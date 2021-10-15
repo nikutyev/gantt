@@ -275,6 +275,7 @@ select {
   );
 }
 
+/*todo rename style and usages*/
 .gtaskgrey {
   height: 18px;
   filter: alpha(opacity=90);
@@ -283,10 +284,40 @@ select {
   background: rgb(100, 100, 100); /* Old browsers */
   background: linear-gradient(
           to right,
-          rgb(200, 200, 200) 0%,
-          rgb(180, 180, 180) 33.333333%,
-          rgb(150, 150, 150) 66.666666%,
-          #646464 100%
+          rgb(223, 162, 129) 0%,
+          rgb(255, 134, 78) 33.333333%,
+          rgb(255, 109, 32) 66.666666%,
+          #ff5101 100%
+  );
+}
+
+.gtaskred {
+  height: 18px;
+  filter: alpha(opacity=90);
+  opacity: 0.9;
+  margin-top: -4px;
+  background: rgb(223, 116, 67); /* Old browsers */
+  background: linear-gradient(
+          to right,
+          rgb(255, 113, 113) 0%,
+          rgb(255, 74, 70) 33.333333%,
+          rgb(255, 46, 47) 66.666666%,
+          #ff000d 100%
+  );
+}
+
+.gtaskyellow {
+  height: 18px;
+  filter: alpha(opacity=90);
+  opacity: 0.9;
+  margin-top: -4px;
+  background: rgb(251, 224, 75); /* Old browsers */
+  background: linear-gradient(
+          to right,
+          rgb(251, 242, 173) 0%,
+          rgb(251, 232, 128) 33.333333%,
+          rgb(251, 224, 75) 66.666666%,
+          #fad400 100%
   );
 }
 
