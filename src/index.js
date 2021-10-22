@@ -15,6 +15,7 @@ import "./autocomplete.css";
 const RED_TASK = "gtaskred";
 const YELLOW_TASK = "gtaskyellow";
 const BLUE_TASK = "gtaskblue";
+const GREEN_TASK = "gtaskgreen";
 
 function onClose(modal) {
   closeAccordion();
@@ -31,7 +32,8 @@ const objectsSelect = document.querySelector("#objects_select");
 const showBaseVersionSelect = document.querySelector("#show_base_version_select");
 
 // TODO remove require
-const data = require("./response.json");
+// const data = require("./response.json");
+const data = require("./alt_response.json");
 // const data = getData();
 
 const array = data.OpenDimResult.meta.els.els.e;
@@ -129,7 +131,7 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
     items = newItems;
   }
 
-  // вычисление подкраски в зависимости от связей
+  // вычисление подкраски и сдвигов в зависимости от связей
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     if (item.a.it[10]) {
@@ -140,16 +142,39 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
         const type = dependency.substring(dependency.length - 2);
         if (type === "FS") {
           const parent = items[getItemIndex(parentId, items)];
-          // если дата окончания родителя больше чем дата начала дочернего элемента, то подкрашиваются оба
-          if (new Date(parent.a.it[4]) > new Date(item.a.it[3])) {
+          const parentPlanEndDate = new Date(parent.a.it[14]);
+          const parentEndDate = new Date(parent.a.it[4]);
+          if (parent.datesShift) {
+            item.datesShift = parent.datesShift;
             parent.color = "gtaskgrey";
             item.color = "gtaskgrey";
+          } else {
+            const shift = parentPlanEndDate - parentEndDate;
+            if (shift > 0){
+              item.datesShift = shift;
+              parent.color = "gtaskgrey";
+              item.color = "gtaskgrey";
+            }
           }
+          // если дата окончания родителя больше чем дата начала дочернего элемента, то подкрашиваются оба
+          // if (new Date(parent.a.it[4]) > new Date(item.a.it[3])) {
+          //   parent.color = "gtaskgrey";
+          //   item.color = "gtaskgrey";
+          // }
         }
       }
     }
   }
 
+  function stringifyDate(date) {
+    let days = date.getDate();
+    let months = date.getMonth() + 1;
+    months = "" + months;
+    if (months.length === 1)
+      months = "0" + months;
+    let years = date.getFullYear();
+    return years + "-" + months + "-" + days;
+  }
 
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
@@ -179,19 +204,34 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
       color = RED_TASK;
 
     // если дата окончания наступит меньше чем через 3 дня
-    if (endDate > today && endDate - today < 3600000 * 24 * 60)
+    if (endDate > today && endDate - today < 3600000 * 24 * 3)
       color = YELLOW_TASK;
+
+    if (endDate < today && accepted === 1)
+      color = GREEN_TASK;
 
     if (item.color)
       color = item.color;
+
+    let pStart = item.a.it[3];
+    let pEnd =  item.a.it[4];
+
+    if (item.datesShift) {
+      const start = new Date(pStart);
+      const end = new Date(pEnd);
+      start.setTime(start.getTime() + item.datesShift);
+      end.setTime(end.getTime() + item.datesShift);
+      pStart = stringifyDate(start);
+      pEnd = stringifyDate(end);
+    }
 
     g.AddTaskItemObject({
       pID: parseInt(item.k),
       pName: item.n,
       // pStart: settings.showBaseVersion ? item.a.it[15] : item.a.it[3],
-      pStart: item.a.it[3],
+      pStart: pStart,
       // pEnd: settings.showBaseVersion ? item.a.it[16] : item.a.it[4],
-      pEnd: item.a.it[4],
+      pEnd: pEnd,
       // pPlanStart: settings.showPredictedDate ? item.a.it[3] : "",
       pPlanStart: settings.showBaseVersion ? item.a.it[15] : (settings.showPredictedDate ? item.a.it[3] : ""),
       // pPlanEnd: settings.showPredictedDate ? item.a.it[14] : "",
@@ -221,7 +261,7 @@ function setParentElementsText(key) {
   let text = item.n;
   while (item.p && item.p.length > 0) {
     item = array[getItemIndex(item.p, array)];
-    text = "<span>" + item.n + "</span>" + "<span>" + text + "</span>";
+    text = "<span>" + item.n.toUpperCase() + "</span>" + "<span>" + text + "</span>";
   }
   parentElementsText.innerHTML = text;
 }
@@ -257,6 +297,7 @@ function buildModalList() {
       li.classList.add("list-child");
       ul.appendChild(li);
     } else {
+      li.innerHTML = item.n.toUpperCase();
       li.classList.add("modal_list-title");
       li.addEventListener("click", function () {
         this.classList.toggle("active");
