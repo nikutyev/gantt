@@ -1,11 +1,11 @@
 import JSGantt from "jsgantt-improved";
 import MicroModal from "micromodal";
-import {jsPDF} from "jspdf";
+import { jsPDF } from "jspdf";
 import html2canvas from "./html2canvas";
 import autoComplete from "@tarekraafat/autocomplete.js";
 
-import {ru} from "./lang.js";
-import {getData, LOCAL_STORAGE_KEY} from "./requestHelper";
+import { ru } from "./lang.js";
+import { getData, LOCAL_STORAGE_KEY } from "./requestHelper";
 
 import "./jsgantt.css";
 import "./main.css";
@@ -25,10 +25,16 @@ const parentElementsText = document.querySelector("#parent_elements");
 const acceptedSelect = document.querySelector("#accepted_select");
 const expandSelect = document.querySelector("#expand_select");
 const hideOldSelect = document.querySelector("#hide_old_select");
-const showAdditionalInfoSelect = document.querySelector("#show_additional_info_select");
-const showPredictedDateSelect = document.querySelector("#show_predicted_date_select");
+const showAdditionalInfoSelect = document.querySelector(
+  "#show_additional_info_select"
+);
+const showPredictedDateSelect = document.querySelector(
+  "#show_predicted_date_select"
+);
 const objectsSelect = document.querySelector("#objects_select");
-const showBaseVersionSelect = document.querySelector("#show_base_version_select");
+const showBaseVersionSelect = document.querySelector(
+  "#show_base_version_select"
+);
 
 // TODO remove require
 const data = require("./response.json");
@@ -150,7 +156,6 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
     }
   }
 
-
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     const next = items[i + 1];
@@ -175,15 +180,17 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
     }
 
     let color = BLUE_TASK;
-    if (item.a.it[14] && planEndDate > endDate || (accepted !== 1 && endDate < today))
+    if (
+      (item.a.it[14] && planEndDate > endDate) ||
+      (accepted !== 1 && endDate < today)
+    )
       color = RED_TASK;
 
     // если дата окончания наступит меньше чем через 3 дня
     if (endDate > today && endDate - today < 3600000 * 24 * 60)
       color = YELLOW_TASK;
 
-    if (item.color)
-      color = item.color;
+    if (item.color) color = item.color;
 
     g.AddTaskItemObject({
       pID: parseInt(item.k),
@@ -193,9 +200,17 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
       // pEnd: settings.showBaseVersion ? item.a.it[16] : item.a.it[4],
       pEnd: item.a.it[4],
       // pPlanStart: settings.showPredictedDate ? item.a.it[3] : "",
-      pPlanStart: settings.showBaseVersion ? item.a.it[15] : (settings.showPredictedDate ? item.a.it[3] : ""),
+      pPlanStart: settings.showBaseVersion
+        ? item.a.it[15]
+        : settings.showPredictedDate
+        ? item.a.it[3]
+        : "",
       // pPlanEnd: settings.showPredictedDate ? item.a.it[14] : "",
-      pPlanEnd: settings.showBaseVersion ? item.a.it[16] : (settings.showPredictedDate ? item.a.it[14] : ""),
+      pPlanEnd: settings.showBaseVersion
+        ? item.a.it[16]
+        : settings.showPredictedDate
+        ? item.a.it[14]
+        : "",
       // pClass: settings.showBaseVersion ? "gtaskgrey" : "gtaskblue",
       pClass: settings.showBaseVersion ? BLUE_TASK : color,
       pLink: "",
@@ -365,141 +380,208 @@ document.addEventListener("DOMContentLoaded", () => {
     updateSession();
   });
 });
-
+// MicroModal.show("loader");
 const saveToPdf = document.getElementById("saveToPdf");
 
-const tableBodyLeft = document.querySelector(".gmainleft .gtasktablewrapper");
-const tableBodyRight = document.querySelector(
-  ".gmainright #GanttChartDIVgchartbody"
-);
-const gantt = document.querySelector("#GanttChartDIV");
-
 saveToPdf.addEventListener("click", () => {
+  MicroModal.show("loader");
   const wrapper = document.querySelector(".wrapper");
-  var headerCanvas = null;
-
-  document.querySelectorAll(".gname.glineitem").forEach((item) => {
-    if (item.getBoundingClientRect().top > 1106) {
-      item.style.background = "#black";
-      return false;
-    }
-  });
-
-  const headerGanttConfig = {
-    height: 80,
-    x: 0,
-    y: 0,
-  };
 
   const wrapperConfig = {
+    logging: true,
     onclone: (el) => {
       const cloneDosumentWidth = 1920;
       const wrapperClone = el.querySelector(".wrapper");
       const ganttClone = wrapperClone.querySelector(".gantt");
-      const leftSideGanttClone = ganttClone.querySelector(".gmainleft");
-      const quarterBtn = ganttClone.querySelector(
-        "#GanttChartDIVformatquartertop"
-      );
-      const taskName = ganttClone.querySelectorAll(
-        ".gtasktable .gname .gtaskname div"
-      );
+      const modal = wrapperClone.querySelector("#loader");
+
+      wrapperClone.removeChild(modal);
+
       const footerLeft = ganttClone.querySelector(
         ".gmainleft .gtasktable tbody tr:last-child"
       );
       const footerRight = ganttClone.querySelector(
         ".gmainright .gcharttable tfoot .footerdays"
       );
-      const gChartClone = gantt.querySelector(".gcharttable");
-      const gRightCloneWidth = parseInt(gChartClone.style.width);
-      const gLeftSideWidth = parseInt(leftSideGanttClone.style.width);
-
-      const commonWidth = gRightCloneWidth + gLeftSideWidth;
-      const marginLeft = (cloneDosumentWidth - commonWidth) / 2;
-
-      //ganttClone.style.marginLeft = `${marginLeft}px`;
-
-      wrapperClone.style.width = `${cloneDosumentWidth}px`;
 
       footerLeft.style.display = "none";
       footerRight.style.display = "none";
+
+      wrapperClone.style.width = `${cloneDosumentWidth}px`;
     },
   };
 
-  tableBodyLeft.setAttribute("data-html2canvas-ignore", true);
-  tableBodyRight.setAttribute("data-html2canvas-ignore", true);
+  html2canvas(wrapper, wrapperConfig).then((canvas) => {
+    let images = calculateDiffs(canvas);
+    setTimeout(() => {
+      createPdf2(canvas, images);
+    });
+  });
+});
 
-  html2canvas(gantt, headerGanttConfig)
-    .then((canvas) => {
-      headerCanvas = canvas;
-      tableBodyLeft.removeAttribute("data-html2canvas-ignore");
-      tableBodyRight.removeAttribute("data-html2canvas-ignore");
-    })
-    .then(() => {
-      html2canvas(wrapper, wrapperConfig).then((canvas) => {
-        // a4 альбомный формат [841.89, 595.28]
-        const A4_HEIGHT = 593;
-        const A4_WIDTH = 842;
-        const contentWidth = canvas.width;
-        const contentHeight = canvas.height;
+function calculateDiffs(canvas) {
+  const pageHeight = 1320;
+  const secondPageHeight = 1240;
+  let images = [];
+  let wrapperHeight = document
+    .querySelector(".wrapper")
+    .getBoundingClientRect().height;
 
-        // высота канваса, которая помещается на одну страницу pdf
-        let pageHeight = (contentWidth / A4_WIDTH) * A4_HEIGHT;
-        // высота канваса, которая не помещается
-        let leftHeight = contentHeight;
-        // сдвиг по оси y
-        let position = 2;
+  function putImagePartIntoImg(context, imgDivId, x, y, width, height) {
+    let imageData = context.getImageData(x, y, width, height);
+    let canvasPart = document.createElement("canvas");
+    let contextPart = canvasPart.getContext("2d");
+    canvasPart.width = width;
+    canvasPart.height = height;
+    contextPart.putImageData(imageData, 0, 0);
+    images.push(canvasPart.toDataURL("image/jpg", 0.6));
+    // document.body.append(canvasPart);
+  }
 
-        const imgWidth = A4_WIDTH;
-        const imgHeight = (A4_WIDTH / contentWidth) * contentHeight;
+  let page = 0;
+  let image = new Image();
+  let headerImg = "";
 
-        const pageData = canvas.toDataURL("image/jpg", 1.0);
-        const headerGanttData = headerCanvas.toDataURL("img/jpg", 1.0);
+  image.onload = function () {
+    let context = canvas.getContext("2d");
+    let copyContext = canvas.getContext("2d");
 
-        let currentPage = 1;
-        const pages = Math.ceil(contentHeight / pageHeight);
+    canvas.width = image.width;
+    canvas.height = image.height;
+    context.drawImage(image, 0, 0);
 
-        const headerGanttHeight = Math.floor(
-          (A4_WIDTH / contentWidth) * headerCanvas.height
+    putImagePartIntoImg(copyContext, "left", 0, 240, image.width, 80);
+    headerImg = images[0];
+
+    while (wrapperHeight > 0) {
+      if (page === 0) {
+        putImagePartIntoImg(
+          context,
+          "left",
+          0,
+          pageHeight * page,
+          image.width,
+          pageHeight
         );
 
-        const pdf = new jsPDF({
-          unit: "pt",
-          orientation: "landscape",
-          format: "a4",
-        });
+        wrapperHeight -= pageHeight;
+      } else if (page === 1) {
+        putImagePartIntoImg(
+          context,
+          "left",
+          0,
+          pageHeight * page,
+          image.width,
+          secondPageHeight
+        );
 
-        if (leftHeight < pageHeight) {
-          pdf.addImage(pageData, "JPEG", 0, 0, imgWidth, imgHeight);
-        } else {
-          while (leftHeight > 0) {
-            if (currentPage === 1) {
-              pdf.addImage(pageData, "JPEG", 0, 2, imgWidth, imgHeight);
-            } else {
-              pdf.addImage(pageData, "JPEG", 0, position, imgWidth, imgHeight);
-              pdf.addImage(
-                headerGanttData,
-                "JPEG",
-                0,
-                0,
-                imgWidth,
-                headerGanttHeight
-              );
-            }
+        wrapperHeight -= secondPageHeight;
+      } else {
+        putImagePartIntoImg(
+          context,
+          "left",
+          0,
+          (secondPageHeight + 40) * page,
+          image.width,
+          secondPageHeight
+        );
+        wrapperHeight -= secondPageHeight;
+      }
 
-            leftHeight -= pageHeight;
-            position -= A4_HEIGHT - headerGanttHeight + currentPage;
-            currentPage += 1;
-            // убираем пустую страницу
-            if (leftHeight > 0) {
-              pdf.addPage();
-            }
-          }
-        }
+      page += 1;
+    }
+  };
 
-        pdf.save("Отчёт.pdf");
-      });
-    });
-});
+  image.src = canvas.toDataURL("image/jpg", 0.6);
+
+  return images;
+}
+
+function createPdf2(canvas, images) {
+  const A4_HEIGHT = 593;
+  const A4_WIDTH = 842;
+  const contentWidth = canvas.width;
+  const contentHeight = canvas.height;
+  // 1460
+
+  // высота канваса, которая помещается на одну страницу pdf
+  let pageHeight = (contentWidth / A4_WIDTH) * A4_HEIGHT;
+  // высота канваса, которая не помещается
+  let leftHeight = contentHeight;
+
+  const imgWidth = A4_WIDTH;
+  const imgHeight = (A4_WIDTH / contentWidth) * 1320;
+
+  const imgSecondHeight = (A4_WIDTH / contentWidth) * 1240;
+  const headerGanttHeight = (A4_WIDTH / contentWidth) * 80;
+
+  let currentPage = 0;
+
+  const pdf = new jsPDF({
+    unit: "pt",
+    orientation: "landscape",
+    format: "a4",
+  });
+
+  if (leftHeight < pageHeight) {
+    pdf.addImage(
+      images[currentPage + 1],
+      "JPEG",
+      0,
+      0,
+      imgWidth,
+      imgHeight,
+      `page${currentPage * Math.random()}`,
+      "MEDIUM"
+    );
+  } else {
+    while (leftHeight > 0) {
+      if (currentPage === 0) {
+        pdf.addImage(
+          images[currentPage + 1],
+          "JPEG",
+          0,
+          0,
+          imgWidth,
+          imgHeight,
+          `page${currentPage * Math.random()}`,
+          "MEDIUM"
+        );
+      } else {
+        pdf.addImage(
+          images[currentPage + 1],
+          "JPEG",
+          0,
+          headerGanttHeight + 10,
+          imgWidth,
+          imgSecondHeight,
+          `page${currentPage * Math.random()}`,
+          "MEDIUM"
+        );
+        pdf.addImage(
+          images[0],
+          "JPEG",
+          0,
+          10,
+          imgWidth,
+          headerGanttHeight,
+          `page${currentPage * Math.random()}`,
+          "MEDIUM"
+        );
+      }
+
+      leftHeight -= pageHeight;
+      currentPage += 1;
+      // убираем пустую страницу
+      if (leftHeight > 0) {
+        pdf.addPage();
+      }
+    }
+  }
+  MicroModal.close("loader");
+
+  pdf.save("Отчёт.pdf");
+}
 
 const autoCompleteJS = new autoComplete({
   selector: "#autocomplete",
@@ -525,6 +607,7 @@ const autoCompleteJS = new autoComplete({
 
         autoCompleteJS.input.value = selection;
         setParentElementsText(parseInt(id));
+        displaySettings.object = null;
         redraw(parseInt(id));
       },
     },
