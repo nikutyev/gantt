@@ -50,6 +50,14 @@ ul {
   z-index: 1;
   position: absolute;
   top: 0px;
+  border: none !important;
+}
+
+.gplan {
+  opacity: 1 !important;
+  background: #c8c8c8 !important;
+  height: 4px !important;
+  margin-top: 4px;
 }
 
 .gTaskNotes {
@@ -312,20 +320,14 @@ select {
   margin-top: 1rem;
 }
 
-.gtaskblue,
-.gtaskblue1,
-.gtaskblue2,
-.gtaskblue3 {
+.gtaskblue {
   height: 18px;
   filter: alpha(opacity=90);
   opacity: 0.9;
   margin-top: -4px;
 }
 
-.gtaskblue,
-.gtaskblue1,
-.gtaskblue2,
-.gtaskblue3 {
+.gtaskblue {
   background: rgb(58, 132, 195); /* Old browsers */
   background: linear-gradient(
     to right,
@@ -336,16 +338,55 @@ select {
   );
 }
 
-.blue-color .gtaskblue,
-.blue-color .gtaskblue1,
-.blue-color .gtaskblue2,
-.blue-color .gtaskblue3 {
+/*todo rename style and usages*/
+.gtaskgrey {
+  height: 18px;
+  filter: alpha(opacity=90);
+  opacity: 0.9;
+  margin-top: -4px;
+  background: rgb(100, 100, 100); /* Old browsers */
+  background: linear-gradient(
+          to right,
+          rgb(223, 162, 129) 0%,
+          rgb(255, 134, 78) 33.333333%,
+          rgb(255, 109, 32) 66.666666%,
+          #ff5101 100%
+  );
+}
+
+.gtaskred {
+  height: 18px;
+  filter: alpha(opacity=90);
+  opacity: 0.9;
+  margin-top: -4px;
+  background: rgb(223, 116, 67); /* Old browsers */
+  background: linear-gradient(
+          to right,
+          rgb(255, 113, 113) 0%,
+          rgb(255, 74, 70) 33.333333%,
+          rgb(255, 46, 47) 66.666666%,
+          #ff000d 100%
+  );
+}
+
+.gtaskyellow {
+  height: 18px;
+  filter: alpha(opacity=90);
+  opacity: 0.9;
+  margin-top: -4px;
+  background: rgb(251, 224, 75); /* Old browsers */
+  background: linear-gradient(
+          to right,
+          rgb(251, 242, 173) 0%,
+          rgb(251, 232, 128) 33.333333%,
+          rgb(251, 224, 75) 66.666666%,
+          #fad400 100%
+  );
+}
+
+.blue-color .gtaskblue{
   background: rgb(58, 132, 195); /* Old browsers */
 }
-/*.gtaskblue2 {*/
-/*    background: rgb(58, 132, 195); !* Old browsers *!*/
-/*    background: linear-gradient(to bottom, rgba(58, 132, 195, 1) 0%, rgb(111, 173, 214) 20%, rgb(143, 208, 240) 40%, rgba(58, 139, 194, 1) 70%, rgba(38, 85, 139, 1) 100%);*/
-/*}*/
 
 #modal_list {
   padding: 10px;

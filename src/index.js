@@ -1,16 +1,20 @@
 import JSGantt from "jsgantt-improved";
 import MicroModal from "micromodal";
-import { jsPDF } from "jspdf";
+import {jsPDF} from "jspdf";
 import html2canvas from "./html2canvas";
 import autoComplete from "@tarekraafat/autocomplete.js";
 
-import { ru } from "./lang.js";
-import { getData, LOCAL_STORAGE_KEY } from "./requestHelper";
+import {ru} from "./lang.js";
+import {getData, LOCAL_STORAGE_KEY} from "./requestHelper";
 
 import "./jsgantt.css";
 import "./main.css";
 import "./micromodal.css";
 import "./autocomplete.css";
+
+const RED_TASK = "gtaskred";
+const YELLOW_TASK = "gtaskyellow";
+const BLUE_TASK = "gtaskblue";
 
 function onClose(modal) {
   closeAccordion();
@@ -21,13 +25,10 @@ const parentElementsText = document.querySelector("#parent_elements");
 const acceptedSelect = document.querySelector("#accepted_select");
 const expandSelect = document.querySelector("#expand_select");
 const hideOldSelect = document.querySelector("#hide_old_select");
-const showAdditionalInfoSelect = document.querySelector(
-  "#show_additional_info_select"
-);
-const showPredictedDateSelect = document.querySelector(
-  "#show_predicted_date_select"
-);
+const showAdditionalInfoSelect = document.querySelector("#show_additional_info_select");
+const showPredictedDateSelect = document.querySelector("#show_predicted_date_select");
 const objectsSelect = document.querySelector("#objects_select");
+const showBaseVersionSelect = document.querySelector("#show_base_version_select");
 
 // TODO remove require
 const data = require("./response.json");
@@ -42,6 +43,7 @@ const displaySettings = {
   showAdditionalInfo: false,
   showPredictedDate: false,
   object: null,
+  showBaseVersion: false,
 };
 
 const pItems = [];
@@ -50,12 +52,13 @@ for (let i = 0; i < array.length; i++) {
     pItems.push(array[i]);
 }
 
-function getItemIndex(key) {
-  for (let i = 0; i < array.length; i++)
-    if (parseInt(array[i].k) === parseInt(key)) return i;
+function getItemIndex(key, arr) {
+  for (let i = 0; i < arr.length; i++)
+    if (parseInt(arr[i].k) === parseInt(key)) return i;
 }
 
 let lastParentKey = null;
+
 function redraw(parentKey = lastParentKey, settings = displaySettings) {
   lastParentKey = parentKey;
 
@@ -93,7 +96,7 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
   g.setShowEndDate(1);
   g.setShowDur(1);
 
-  let index = getItemIndex(parentKey) + 1;
+  let index = getItemIndex(parentKey, array) + 1;
   let items = [];
   while (true) {
     const item = array[index];
@@ -126,11 +129,37 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
     items = newItems;
   }
 
+  // вычисление подкраски в зависимости от связей
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    if (item.a.it[10]) {
+      const deps = item.a.it[10].split(" ");
+      for (let j = 0; j < deps.length; j++) {
+        const dependency = deps[j];
+        const parentId = dependency.substring(0, dependency.length - 2);
+        const type = dependency.substring(dependency.length - 2);
+        if (type === "FS") {
+          const parent = items[getItemIndex(parentId, items)];
+          // если дата окончания родителя больше чем дата начала дочернего элемента, то подкрашиваются оба
+          if (new Date(parent.a.it[4]) > new Date(item.a.it[3])) {
+            parent.color = "gtaskgrey";
+            item.color = "gtaskgrey";
+          }
+        }
+      }
+    }
+  }
+
+
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     const next = items[i + 1];
     const level = parseInt(item.a.it[7]);
-    // const accepted = item.a.it[8];
+    const dependencies = item.a.it[10] ? item.a.it[10].split(" ") : "";
+
+    const endDate = new Date(item.a.it[4]);
+    const planEndDate = new Date(item.a.it[14]);
+    const accepted = parseInt(item.a.it[8]);
 
     let notes = "";
     if (settings.showAdditionalInfo) {
@@ -145,17 +174,30 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
         item.a.it[13];
     }
 
+    let color = BLUE_TASK;
+    if (item.a.it[14] && planEndDate > endDate || (accepted !== 1 && endDate < today))
+      color = RED_TASK;
+
+    // если дата окончания наступит меньше чем через 3 дня
+    if (endDate > today && endDate - today < 3600000 * 24 * 60)
+      color = YELLOW_TASK;
+
+    if (item.color)
+      color = item.color;
+
     g.AddTaskItemObject({
       pID: parseInt(item.k),
       pName: item.n,
+      // pStart: settings.showBaseVersion ? item.a.it[15] : item.a.it[3],
       pStart: item.a.it[3],
+      // pEnd: settings.showBaseVersion ? item.a.it[16] : item.a.it[4],
       pEnd: item.a.it[4],
-      pPlanStart: settings.showPredictedDate ? item.a.it[3] : "",
-      pPlanEnd: settings.showPredictedDate ? item.a.it[14] : "",
-      pClass:
-        item.o - 1 < 4 && item.o - 1 > 0
-          ? "gtaskblue" + (item.o - 1)
-          : "gtaskblue",
+      // pPlanStart: settings.showPredictedDate ? item.a.it[3] : "",
+      pPlanStart: settings.showBaseVersion ? item.a.it[15] : (settings.showPredictedDate ? item.a.it[3] : ""),
+      // pPlanEnd: settings.showPredictedDate ? item.a.it[14] : "",
+      pPlanEnd: settings.showBaseVersion ? item.a.it[16] : (settings.showPredictedDate ? item.a.it[14] : ""),
+      // pClass: settings.showBaseVersion ? "gtaskgrey" : "gtaskblue",
+      pClass: settings.showBaseVersion ? BLUE_TASK : color,
       pLink: "",
       pMile: 0,
       pRes: item.a.it[5],
@@ -166,7 +208,7 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
           ? parseInt(item.p)
           : 0,
       pOpen: settings.expandAll ? 1 : 0,
-      pDepend: item.a.it[10] ? item.a.it[10].split(" ") : "",
+      pDepend: dependencies,
       pCaption: "",
       pNotes: notes,
     });
@@ -175,10 +217,10 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
 }
 
 function setParentElementsText(key) {
-  let item = array[getItemIndex(key)];
+  let item = array[getItemIndex(key, array)];
   let text = item.n;
   while (item.p && item.p.length > 0) {
-    item = array[getItemIndex(item.p)];
+    item = array[getItemIndex(item.p, array)];
     text = "<span>" + item.n + "</span>" + "<span>" + text + "</span>";
   }
   parentElementsText.innerHTML = text;
@@ -293,6 +335,10 @@ showPredictedDateSelect.addEventListener("change", (e) => {
 });
 objectsSelect.addEventListener("change", (e) => {
   displaySettings.object = e.target.value;
+  redraw();
+});
+showBaseVersionSelect.addEventListener("change", (e) => {
+  displaySettings.showBaseVersion = e.target.value;
   redraw();
 });
 
