@@ -78,21 +78,22 @@
                 </div>
             </div>
             <div class="select-container">
-                <label for="show_additional_info_select">Дополнительная информация</label>
-                <div class="select">
-                    <select id="show_additional_info_select">
-                        <option value="" selected>Скрыть</option>
-                        <option value="true">Показать</option>
-                    </select>
-                    <span class="focus"></span>
-                </div>
-            </div>
-            <div class="select-container">
                 <label for="show_base_version_select">Базовая версия</label>
                 <div class="select">
                     <select id="show_base_version_select">
                         <option value="" selected>Скрыть</option>
                         <option value="true">Отобразить</option>
+                    </select>
+                    <span class="focus"></span>
+                </div>
+            </div>
+            <div class="select-container">
+                <label for="show_additional_info_select">Поля всплывающей подсказки</label>
+                <div class="select">
+                    <select multiple size="3" id="show_additional_info_select">
+                        <option value="customer">Заказчик</option>
+                        <option value="contractor">Подрядчик</option>
+                        <option value="comment">Комментарий</option>
                     </select>
                     <span class="focus"></span>
                 </div>

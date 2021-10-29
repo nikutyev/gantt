@@ -187,19 +187,20 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
     const accepted = parseInt(item.a.it[8]);
 
     let notes = "";
-    if (settings.showAdditionalInfo) {
-      notes =
-        "Заказчик: " +
-        item.a.it[11] +
-        "<br>" +
-        "Подрядчик: " +
-        item.a.it[12] +
-        "<br>" +
-        "Комментарий: " +
-        item.a.it[13];
+    if (settings.showAdditionalInfo.length > 0) {
+      if (settings.showAdditionalInfo.includes("customer"))
+        notes += "Заказчик: " + item.a.it[11] + "<br>";
+      if (settings.showAdditionalInfo.includes("contractor"))
+        notes +=  "Подрядчик: " + item.a.it[12] + "<br>";
+      if (settings.showAdditionalInfo.includes("comment"))
+        notes +=  "Комментарий: " + item.a.it[13];
     }
 
     let color = BLUE_TASK;
+
+    if (endDate < today && accepted === 1)
+      color = GREEN_TASK;
+
     if (item.a.it[14] && planEndDate > endDate || (accepted !== 1 && endDate < today))
       color = RED_TASK;
 
@@ -207,37 +208,32 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
     if (endDate > today && endDate - today < 3600000 * 24 * 3)
       color = YELLOW_TASK;
 
-    if (endDate < today && accepted === 1)
-      color = GREEN_TASK;
-
     if (item.color)
       color = item.color;
 
     let pStart = item.a.it[3];
     let pEnd =  item.a.it[4];
 
+    let pPlanStart = item.a.it[3];
+    let pPlanEnd =  item.a.it[14];
+
     if (item.datesShift) {
-      const start = new Date(pStart);
-      const end = new Date(pEnd);
+      const start = new Date(pPlanStart);
+      const end = new Date(pPlanEnd);
       start.setTime(start.getTime() + item.datesShift);
       end.setTime(end.getTime() + item.datesShift);
-      pStart = stringifyDate(start);
-      pEnd = stringifyDate(end);
+      pPlanStart = stringifyDate(start);
+      pPlanEnd = stringifyDate(end);
     }
 
     g.AddTaskItemObject({
       pID: parseInt(item.k),
       pName: item.n,
-      // pStart: settings.showBaseVersion ? item.a.it[15] : item.a.it[3],
       pStart: pStart,
-      // pEnd: settings.showBaseVersion ? item.a.it[16] : item.a.it[4],
       pEnd: pEnd,
-      // pPlanStart: settings.showPredictedDate ? item.a.it[3] : "",
-      pPlanStart: settings.showBaseVersion ? item.a.it[15] : (settings.showPredictedDate ? item.a.it[3] : ""),
-      // pPlanEnd: settings.showPredictedDate ? item.a.it[14] : "",
-      pPlanEnd: settings.showBaseVersion ? item.a.it[16] : (settings.showPredictedDate ? item.a.it[14] : ""),
-      // pClass: settings.showBaseVersion ? "gtaskgrey" : "gtaskblue",
-      pClass: settings.showBaseVersion ? BLUE_TASK : color,
+      pPlanStart: settings.showBaseVersion ? item.a.it[15] : (settings.showPredictedDate ? pPlanStart : ""),
+      pPlanEnd: settings.showBaseVersion ? item.a.it[16] : (settings.showPredictedDate ? pPlanEnd : ""),
+      pClass: color,
       pLink: "",
       pMile: 0,
       pRes: item.a.it[5],
@@ -367,7 +363,12 @@ hideOldSelect.addEventListener("change", (e) => {
   redraw();
 });
 showAdditionalInfoSelect.addEventListener("change", (e) => {
-  displaySettings.showAdditionalInfo = e.target.value;
+  const vals = [];
+  const selected = e.target.selectedOptions;
+  for (let i = 0; i < selected.length; i++) {
+    vals.push(selected[i].value);
+  }
+  displaySettings.showAdditionalInfo = vals;
   redraw();
 });
 showPredictedDateSelect.addEventListener("change", (e) => {
