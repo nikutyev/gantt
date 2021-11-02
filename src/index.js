@@ -5,7 +5,7 @@ import html2canvas from "./html2canvas";
 import autoComplete from "@tarekraafat/autocomplete.js";
 
 import {ru} from "./lang.js";
-import {getData, LOCAL_STORAGE_KEY} from "./requestHelper";
+import {getData, getSettings, LOCAL_STORAGE_KEY} from "./requestHelper";
 
 import "./jsgantt.css";
 import "./main.css";
@@ -16,6 +16,7 @@ const RED_TASK = "gtaskred";
 const YELLOW_TASK = "gtaskyellow";
 const BLUE_TASK = "gtaskblue";
 const GREEN_TASK = "gtaskgreen";
+const DEFAULT_DAYS_TO_YELLOW = 3;
 
 function onClose(modal) {
   closeAccordion();
@@ -32,8 +33,9 @@ const objectsSelect = document.querySelector("#objects_select");
 const showBaseVersionSelect = document.querySelector("#show_base_version_select");
 
 // TODO remove require
-// const data = require("./response.json");
 const data = require("./alt_response.json");
+const requestedSettings = null;
+// const requestedSettings = getSettings();
 // const data = getData();
 
 const array = data.OpenDimResult.meta.els.els.e;
@@ -204,8 +206,9 @@ function redraw(parentKey = lastParentKey, settings = displaySettings) {
     if (item.a.it[14] && planEndDate > endDate || (accepted !== 1 && endDate < today))
       color = RED_TASK;
 
-    // если дата окончания наступит меньше чем через 3 дня
-    if (endDate > today && endDate - today < 3600000 * 24 * 3)
+    // если дата окончания наступит меньше чем через n дней
+    const days = requestedSettings.daysTillExpiration ? requestedSettings.daysTillExpiration : DEFAULT_DAYS_TO_YELLOW;
+    if (endDate > today && endDate - today < 3600000 * 24 * days)
       color = YELLOW_TASK;
 
     if (item.color)
