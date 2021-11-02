@@ -86,64 +86,53 @@ function requestSettings(token) {
   xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.send(JSON.stringify(
     {
-      GetCube:
-        {
-          tCube:
-            {
-              id: token + "!4257016"
-            },
-          tArg:
-            {
-              data:
+      GetCube: {
+        tCube: {
+          id: token + "!4257016"
+        },
+        tArg: {
+          data: {
+            cells: true,
+            emptyCells: false,
+            selection: {
+              it: [
                 {
-                  cells: true,
-                  emptyCells: false,
-                  selection:
-                    {
-                      it:
-                        [
-                          {
-                            k: 4257010,
-                            id: "DIM_GANT_CONFIG",
-                            sel:
-                              {
-                                elSelectOp: "Select",
-                                elRelative: "All"
-                              }
-                          },
-                          {
-                            k: 4257022,
-                            id: "FACTS",
-                            sel:
-                              {
-                                elSelectOp: "Select",
-                                elRelative: "All"
-                              }
-                          }
-                        ]
-                    },
-                  dims:
-                    {
-                      its:
-                        {
-                          it:
-                            [
-                              {
-                                k: 4257010,
-                                id: "DIM_GANT_CONFIG",
-                                position: "Top"
-                              },
-                              {
-                                k: 4257022,
-                                id: "FACTS",
-                                position: "Left"
-                              }
-                            ]
-                        }
-                    }
+                  k: 4257010,
+                  id: "DIM_GANT_CONFIG",
+                  sel: {
+                    elSelectOp: "Select",
+                    elRelative: "All"
+                  }
+                },
+                {
+                  k: 4257022,
+                  id: "FACTS",
+                  sel: {
+                    elSelectOp: "Select",
+                    elRelative: "All"
+                  }
                 }
+              ]
+            },
+            dims: {
+              its: {
+                it: [
+                  {
+                    k: 4257010,
+                    id: "DIM_GANT_CONFIG",
+                    position: "Top"
+                  },
+                  {
+                    k: 4257022,
+                    id: "FACTS",
+                    position: "Left"
+                  }
+                ]
+              }
             }
+          }
         }
+      }
     }
   ));
   if (xhr.status === 200) {
@@ -190,7 +179,7 @@ function getData() {
 function getSettings() {
   const settingsRaw = doRequest(REQUESTED_DATA.SETTINGS);
   return {
-      daysTillExpiration: parseInt(settingsRaw.GetCubeResult.data.cells.c[0]["@v"]),
+    daysTillExpiration: parseInt(settingsRaw.GetCubeResult.data.cells.c[0]["@v"]),
   }
 }
 
