@@ -34,7 +34,7 @@ const showBaseVersionSelect = document.querySelector("#show_base_version_select"
 
 // TODO remove require
 const data = require("./alt_response.json");
-const requestedSettings = null;
+const requestedSettings = {};
 // const requestedSettings = getSettings();
 // const data = getData();
 
