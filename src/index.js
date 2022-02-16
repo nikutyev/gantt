@@ -5,7 +5,7 @@ import html2canvas from "./html2canvas";
 import autoComplete from "@tarekraafat/autocomplete.js";
 
 import {ru} from "./lang.js";
-import {getData, getSettings, LOCAL_STORAGE_KEY} from "./requestHelper";
+import {getData, getSettings, LOCAL_STORAGE_TOKEN, LOCAL_STORAGE_YEAR} from "./requestHelper";
 
 import "./jsgantt.css";
 import "./main.css";
@@ -23,6 +23,7 @@ function onClose(modal) {
 }
 
 let dataObjects = [];
+const yearSelect = document.querySelector("#year_select");
 const parentElementsText = document.querySelector("#parent_elements");
 const acceptedSelect = document.querySelector("#accepted_select");
 const expandSelect = document.querySelector("#expand_select");
@@ -31,6 +32,23 @@ const showAdditionalInfoSelect = document.querySelector("#show_additional_info_s
 const showPredictedDateSelect = document.querySelector("#show_predicted_date_select");
 const objectsSelect = document.querySelector("#objects_select");
 const showBaseVersionSelect = document.querySelector("#show_base_version_select");
+
+function fillYearSelect(startYear, numberOfYears) {
+  let savedYear = localStorage.getItem(LOCAL_STORAGE_YEAR);
+  if (!savedYear) {
+    savedYear = startYear;
+    localStorage.setItem(LOCAL_STORAGE_YEAR, startYear);
+  }
+  for (let i = 0; i < numberOfYears; i++) {
+    const option = document.createElement("option");
+    option.selected = (startYear - i) === parseInt(savedYear);
+    option.innerHTML = (startYear - i).toString();
+    option.value = (startYear - i).toString();
+    yearSelect.appendChild(option);
+  }
+}
+
+fillYearSelect(new Date().getFullYear(), 4);
 
 // TODO remove require
 const data = require("./alt_response.json");
@@ -353,6 +371,10 @@ parentElementsText.addEventListener("click", () => {
     onClose: onClose,
   });
 });
+yearSelect.addEventListener("change", e => {
+  localStorage.setItem(LOCAL_STORAGE_YEAR, e.target.value);
+  window.location.reload();
+});
 acceptedSelect.addEventListener("change", (e) => {
   displaySettings.acceptedStatus = e.target.value;
   redraw();
@@ -399,7 +421,7 @@ function closeAccordion() {
 }
 
 function updateSession() {
-  localStorage.setItem(LOCAL_STORAGE_KEY, "");
+  localStorage.setItem(LOCAL_STORAGE_TOKEN, "");
   document.location.reload();
 }
 

@@ -25,7 +25,15 @@
                 <label for="objects_select">Поиск</label>
                 <input type="search" id="autocomplete" class="input" autocomplete="off">
             </div>
-            <div class="select-container">
+            <div class="select-container select-container-constrained">
+                <label for="year_select">Год</label>
+                <div class="select">
+                    <select id="year_select">
+                    </select>
+                    <span class="focus"></span>
+                </div>
+            </div>
+            <div class="select-container select-container-constrained">
                 <label for="objects_select">Объект</label>
                 <div class="select">
                     <select id="objects_select">
@@ -34,7 +42,7 @@
                     <span class="focus"></span>
                 </div>
             </div>
-            <div class="select-container">
+            <div class="select-container select-container-constrained">
                 <label for="accepted_select">Статус согласования</label>
                 <div class="select">
                     <select id="accepted_select">

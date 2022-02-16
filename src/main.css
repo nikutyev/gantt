@@ -306,6 +306,10 @@ select {
   margin-top: 1rem;
 }
 
+.select-container-constrained {
+  max-width: 180px;
+}
+
 .gtaskblue {
   height: 18px;
   filter: alpha(opacity=90);

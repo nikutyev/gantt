@@ -1,4 +1,5 @@
-const LOCAL_STORAGE_KEY = "prognozToken";
+const LOCAL_STORAGE_TOKEN = "prognozToken";
+const LOCAL_STORAGE_YEAR = "tableYear";
 const URL = "https://prognoz48.admlr.lipetsk.ru/PP_App_v8.0/app/PPService.axd";
 const REQUESTED_DATA = {
   TABLE: "TABLE",
@@ -39,6 +40,31 @@ function authorize() {
 }
 
 function requestData(token) {
+  let args = {
+    it: []
+  };
+  const urlParams = new URLSearchParams(window.location.search);
+  const userKey = urlParams.get("userkey");
+  if (userKey && userKey.toString() !== "1") {
+    args.it.push(
+        {
+          id: "USERKEY",
+          value: userKey,
+          k: "18446744073709551615",
+        }
+    );
+  }
+  const year = localStorage.getItem(LOCAL_STORAGE_YEAR);
+  if (year) {
+    args.it.push(
+        {
+          id: "D",
+          value: "31.12." + year,
+          k: "18446744073709551615",
+        }
+    )
+  }
+
   const xhr = new XMLHttpRequest();
   xhr.open("POST", URL, false);
   xhr.setRequestHeader('Content-Type', 'application/json');
@@ -49,7 +75,7 @@ function requestData(token) {
           id: token + "!4238578"
         },
         tArg: {
-          openArgs: "",
+          openArgs: args.it.length > 0 ? {args: args} : "",
           metaArg: {
             pattern: {
               obInst: "false",
@@ -159,14 +185,14 @@ function doRequest(requestedData) {
       break;
   }
 
-  let token = localStorage.getItem(LOCAL_STORAGE_KEY);
+  let token = localStorage.getItem(LOCAL_STORAGE_TOKEN);
   let result = null;
   if (token) {
     result = requestFunction(token);
   }
   if (!result) {
     token = authorize();
-    localStorage.setItem(LOCAL_STORAGE_KEY, token);
+    localStorage.setItem(LOCAL_STORAGE_TOKEN, token);
     result = requestFunction(token);
   }
   return result;
@@ -183,5 +209,5 @@ function getSettings() {
   }
 }
 
-export {getSettings, getData, LOCAL_STORAGE_KEY};
+export {getSettings, getData, LOCAL_STORAGE_TOKEN, LOCAL_STORAGE_YEAR};
 
